@@ -1,0 +1,12 @@
+{
+  "boxAppSettings": {
+    "clientID": "someLongIdString",
+    "clientSecret": "noneOfMyBusinessWhatSecretsTheClientHas",
+    "appAuth": {
+      "publicKeyID": "someIdString",
+      "privateKey": "-----BEGIN ENCRYPTED PRIVATE KEY-----\nMIIFDsuperSecurePrivateKey\nWic=\n-----END ENCRYPTED PRIVATE KEY-----\n",
+      "passphrase": "superSecurePassphrase"
+    }
+  },
+  "enterpriseID": "IdNumber"
+}

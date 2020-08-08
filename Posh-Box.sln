@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29806.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Posh-Box", "src\Posh-Box.csproj", "{6483B1E4-A378-4FB1-BC84-61113133D0CC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{84F40AE6-D13B-4B63-B741-D84BC8622AE5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Posh-Box.Tests", "tests\Posh-Box.Tests\Posh-Box.Tests.csproj", "{8593F052-2F72-4DFA-B9B3-56273A7BA317}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Release|Any CPU = Release|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6483B1E4-A378-4FB1-BC84-61113133D0CC}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{6483B1E4-A378-4FB1-BC84-61113133D0CC}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{6483B1E4-A378-4FB1-BC84-61113133D0CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6483B1E4-A378-4FB1-BC84-61113133D0CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8593F052-2F72-4DFA-B9B3-56273A7BA317}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8593F052-2F72-4DFA-B9B3-56273A7BA317}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8593F052-2F72-4DFA-B9B3-56273A7BA317}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8593F052-2F72-4DFA-B9B3-56273A7BA317}.Debug|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D716BE9D-B94E-4E9E-8F3D-A7B2522C334F}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{8593F052-2F72-4DFA-B9B3-56273A7BA317} = {84F40AE6-D13B-4B63-B741-D84BC8622AE5}
+	EndGlobalSection
+EndGlobal

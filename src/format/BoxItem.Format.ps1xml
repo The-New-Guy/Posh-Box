@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Configuration>
+    <SelectionSets>
+        <SelectionSet>
+            <Name>BoxItemTypes</Name>
+            <Types>
+                <TypeName>Box.V2.Models.BoxFolder</TypeName>
+                <TypeName>Box.V2.Models.BoxFile</TypeName>
+            </Types>
+        </SelectionSet>
+    </SelectionSets>
+
+    <!-- ################ GLOBAL CONTROL DEFINITIONS ################ -->
+    <Controls>
+        <Control>
+            <Name>BoxItemTypes-GroupingFormat</Name>
+            <CustomControl>
+                <CustomEntries>
+                    <CustomEntry>
+                        <CustomItem>
+                            <Frame>
+                                <LeftIndent>4</LeftIndent>
+                                <CustomItem>
+                                    <ExpressionBinding>
+                                        <ScriptBlock>
+                                            "BoxFolder: " + $_.Parent.Name
+                                        </ScriptBlock>
+                                    </ExpressionBinding>
+                                    <NewLine/>
+                                </CustomItem>
+                            </Frame>
+                        </CustomItem>
+                    </CustomEntry>
+                </CustomEntries>
+            </CustomControl>
+        </Control>
+    </Controls>
+
+    <!-- ################ VIEW DEFINITIONS ################ -->
+
+    <ViewDefinitions>
+        <View>
+            <Name>children</Name>
+            <ViewSelectedBy>
+                <SelectionSetName>BoxItemTypes</SelectionSetName>
+            </ViewSelectedBy>
+            <GroupBy>
+                <PropertyName>Parent.Name</PropertyName>
+                <CustomControlName>BoxItemTypes-GroupingFormat</CustomControlName>
+            </GroupBy>
+            <TableControl>
+                <TableHeaders>
+                    <TableColumnHeader>
+                        <Label>Name</Label>
+                        <Width>35</Width>
+                        <Alignment>left</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>Id</Label>
+                        <Width>20</Width>
+                        <Alignment>center</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>Type</Label>
+                        <Width>6</Width>
+                        <Alignment>center</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>Path</Label>
+                        <Alignment>left</Alignment>
+                    </TableColumnHeader>
+                </TableHeaders>
+                <TableRowEntries>
+                    <TableRowEntry>
+                        <!-- <Wrap/> -->
+                        <TableColumnItems>
+                            <TableColumnItem>
+                                <PropertyName>Name</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>Id</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <PropertyName>Type</PropertyName>
+                            </TableColumnItem>
+                            <TableColumnItem>
+                                <ScriptBlock>
+                                    if ($_.PathCollection -ne $null) {
+                                        '/' + ($_.PathCollection.Entries.Where({ $_.Name -ne 'All Files'}).Name -join '/')
+                                    }
+                                </ScriptBlock>
+                            </TableColumnItem>
+                        </TableColumnItems>
+                    </TableRowEntry>
+                </TableRowEntries>
+            </TableControl>
+        </View>
+        <View>
+            <Name>children</Name>
+            <ViewSelectedBy>
+                <SelectionSetName>BoxItemTypes</SelectionSetName>
+            </ViewSelectedBy>
+            <GroupBy>
+                <PropertyName>Parent.Name</PropertyName>
+                <CustomControlName>BoxItemTypes-GroupingFormat</CustomControlName>
+            </GroupBy>
+            <ListControl>
+                <ListEntries>
+                    <ListEntry>
+                        <EntrySelectedBy>
+                            <TypeName>Box.V2.Models.BoxFile</TypeName>
+                        </EntrySelectedBy>
+                        <ListItems>
+                            <ListItem>
+                                <PropertyName>Name</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>Id</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <ItemSelectionCondition>
+                                    <ScriptBlock> $_.OwnedBy -ne $null </ScriptBlock>
+                                </ItemSelectionCondition>
+                                <Label>OwnedBy</Label>
+                                <ScriptBlock>
+                                    $_.OwnedBy.Login
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>Type</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>Sha1</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <ItemSelectionCondition>
+                                    <ScriptBlock> $_.PathCollection -ne $null </ScriptBlock>
+                                </ItemSelectionCondition>
+                                <Label>Path</Label>
+                                <ScriptBlock>
+                                    $path = '/' + ($_.PathCollection.Entries.Where({ $_.Name -ne 'All Files'}).Name -join '/')
+                                    if ($path.Length -gt 150) { $path.Substring(0,150) + '...' } else { $path }
+                                </ScriptBlock>
+                            </ListItem>
+                        </ListItems>
+                    </ListEntry>
+                    <ListEntry>
+                        <ListItems>
+                            <ListItem>
+                                <PropertyName>Name</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>Id</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <ItemSelectionCondition>
+                                    <ScriptBlock> $_.OwnedBy -ne $null </ScriptBlock>
+                                </ItemSelectionCondition>
+                                <Label>OwnedBy</Label>
+                                <ScriptBlock>
+                                    $_.OwnedBy.Login
+                                </ScriptBlock>
+                            </ListItem>
+                            <ListItem>
+                                <PropertyName>Type</PropertyName>
+                            </ListItem>
+                            <ListItem>
+                                <ItemSelectionCondition>
+                                    <ScriptBlock> $_.PathCollection -ne $null </ScriptBlock>
+                                </ItemSelectionCondition>
+                                <Label>Path</Label>
+                                <ScriptBlock>
+                                    $path = '/' + ($_.PathCollection.Entries.Where({ $_.Name -ne 'All Files'}).Name -join '/')
+                                    if ($path.Length -gt 150) { $path.Substring(0,150) + '...' } else { $path }
+                                </ScriptBlock>
+                            </ListItem>
+                        </ListItems>
+                    </ListEntry>
+                </ListEntries>
+            </ListControl>
+        </View>
+        <View>
+            <Name>children</Name>
+            <ViewSelectedBy>
+                <SelectionSetName>BoxItemTypes</SelectionSetName>
+            </ViewSelectedBy>
+            <GroupBy>
+                <PropertyName>Parent.Name</PropertyName>
+                <CustomControlName>BoxItemTypes-GroupingFormat</CustomControlName>
+            </GroupBy>
+            <WideControl>
+                <WideEntries>
+                    <WideEntry>
+                        <WideItem>
+                            <PropertyName>Name</PropertyName>
+                        </WideItem>
+                    </WideEntry>
+                    <WideEntry>
+                        <EntrySelectedBy>
+                            <TypeName>Box.V2.Models.BoxFolder</TypeName>
+                        </EntrySelectedBy>
+                        <WideItem>
+                            <PropertyName>Name</PropertyName>
+                            <FormatString>[{0}]</FormatString>
+                        </WideItem>
+                    </WideEntry>
+                </WideEntries>
+            </WideControl>
+        </View>
+    </ViewDefinitions>
+</Configuration>

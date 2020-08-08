@@ -1,0 +1,43 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/src/Posh-Box.csproj",
+                "-o",
+                "${workspaceFolder}/src/lib"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+
+        {
+            "label": "clean",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "clean",
+                "${workspaceFolder}/src/Posh-Box.csproj",
+                "-o",
+                "${workspaceFolder}/src/lib"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+
+        {
+            "label": "unit tests",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "test",
+                "${workspaceFolder}/tests/Posh-Box.Tests/Posh-Box.Tests.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        }
+    ]
+}
