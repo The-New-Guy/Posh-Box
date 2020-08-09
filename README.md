@@ -146,6 +146,44 @@ $item = Get-BoxItem -UserID 123456789 -ItemID 123456789012
 $items = Get-BoxItem -UserID 123456789 -ItemID 123456789012 -ItemType File
 ```
 
+### Search for Items
+
+There are many ways to search for items on Box. Here are just a few:
+
+```powershell
+# Search for items with any of the words "New", "Text", "Document" in the default content fields (Name and Description).
+# Search is limited to items the UserID has access to.
+Search-Box 'New Text Document' -UserID 123456789
+
+# Search for items with "New Text Document" in the default content fields (Name and Description).
+Search-Box '"New Text Document"' -UserID 123456789
+
+# Make 3 separate searches for items with any of the words "New", "Text", "Document" in the default content fields (Name and Description).
+'New', 'Text', 'Document' | Search-Box -UserID 123456789
+
+# Search for items with the word "CoolAwesomeFile" in the default content fields (Name and Description).
+# Search is limited to items under the AncestorFolders location recursively.
+Search-Box 'CoolAwesomeFile' -UserID 123456789 -AncestorFolders 123456789012
+
+# Search for items with the word "CoolAwesomeSharedFile" in the default content fields (Name and Description).
+# Search is limited to items the UserID has access to and to items owned by OwnerID.
+Search-Box 'CoolAwesomeSharedFile' -UserID 123456789 -OwnerID 987654321
+
+# Search for items with the word "Backup" in the default content fields (Name and Description).
+# Search is limited to items over 1GB in size.
+Search-Box 'Backup' -UserID 123456789 -SizeLowerBound 1GB
+
+# Search for items with the word "CoolAwesomeFile" in the default content fields (Name and Description).
+# Search is limited to items created after 12/21/2012 12:00:00 AM.
+Search-Box 'CoolAwesomeFile' -UserID 123456789 -CreatedAfter '12/21/2012 12:00:00 AM'
+# -- OR 2-DAYS AGO -- #
+Search-Box 'CoolAwesomeFile' -UserID 123456789 -CreatedAfter (Get-Date).AddDays(-2)
+
+# Search for items with the word "CoolAwesomeFile" in the default content fields (Name and Description).
+# Search is limited to items with a file extension of ".txt" or ".doc".
+Search-Box 'CoolAwesomeFile' -UserID 123456789 -FileExtensions 'txt', 'doc'
+```
+
 ## Common Properties to Review
 
 Each of the code snippets below assume you have already acquired a list of Box items as seen in the previous examples.
