@@ -97,13 +97,10 @@ namespace PoshBox.Helper
             "Id",
             "Type",
             "CreatedAt",
-            "CreatedBy",
-            "Description",
+            "SpaceAmount",
+            "SpaceUsed",
             "Name",
-            "OwnedBy",
-            "Permissions",
-            "Parent",
-            "PathCollection"
+            "Login"
         };
 
         IEnumerable<CompletionResult> IArgumentCompleter.CompleteArgument(

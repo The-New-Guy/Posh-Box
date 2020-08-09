@@ -65,6 +65,7 @@ Description = 'PowerShell module used to perform administrative tasks against th
 # Format files (.ps1xml) to be loaded when importing this module
 FormatsToProcess = @(
     'format/BoxItem.Format.ps1xml'
+    'format/BoxUser.Format.ps1xml'
 )
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess

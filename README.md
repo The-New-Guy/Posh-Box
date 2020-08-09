@@ -184,6 +184,19 @@ Search-Box 'CoolAwesomeFile' -UserID 123456789 -CreatedAfter (Get-Date).AddDays(
 Search-Box 'CoolAwesomeFile' -UserID 123456789 -FileExtensions 'txt', 'doc'
 ```
 
+### Get User Information
+
+```powershell
+# Return the user specified by ID.
+Get-BoxUser -UserID 123456789
+
+# Search for a user with "dvader" in the name or login.
+Get-BoxUser -SearchUser "dvader"
+
+# Search for a user with "Darth Vader" in the name or login.
+Get-BoxUser -SearchUser "Darth Vader"
+```
+
 ## Common Properties to Review
 
 Each of the code snippets below assume you have already acquired a list of Box items as seen in the previous examples.
