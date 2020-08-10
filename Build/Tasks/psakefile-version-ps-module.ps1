@@ -37,8 +37,9 @@ Set-Content -Path $ModuleManifest -Value $manifestContent -NoNewLine -Force -Ver
 "Updating project file : $ProjectFile"
 $Separator[1..24] -join ''
 $projectFileContent = Get-Content -Path $ProjectFile -Raw
-$projectFileContent = $projectFileContent -replace "(?<=<AssemblyVersion>)(?<ModVer>.*)(?=<)", $GitVersionMajorMinorPatch
-$projectFileContent = $projectFileContent -replace "(?<=<FileVersion>)(?<ModVer>.*)(?=<)", $GitVersionMajorMinorPatch
+$projectFileContent = $projectFileContent -replace "(?<=<Version>)(?<ModVer>.*)(?=<)", $GitVersionMajorMinorPatch
+$projectFileContent = $projectFileContent -replace "(?<=<AssemblyVersion>)(?<ModVer>.*)(?=<)", $GitVersionAssemblySemVer
+$projectFileContent = $projectFileContent -replace "(?<=<FileVersion>)(?<ModVer>.*)(?=<)", $GitVersionAssemblySemVer
 Set-Content -Path $ProjectFile -Value $projectFileContent -NoNewLine -Force -Verbose:$IsVerbose
 
 "`n"

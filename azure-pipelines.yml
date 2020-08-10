@@ -27,7 +27,7 @@ jobs:
 
   steps:
 
-  - task: gittools.gitversion.gitversion-task.GitVersion@4
+  - task: gittools.gitversion.gitversion-task.GitVersion@5
     displayName: GitVersion
     inputs:
       preferBundledVersion: false
@@ -39,6 +39,7 @@ jobs:
       Contents: |
         src\**
         tests\**
+        $(Custom.ProjectName).sln
       TargetFolder: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)'
       CleanTargetFolder: true
 
@@ -70,21 +71,19 @@ jobs:
       command: restore
       feedsToUse: select
       vstsFeed: NGGet
-      workingDirectory: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\src'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet build Release'
+    inputs:
+      command: build
+      arguments: '--configuration Release -v m -o $(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\src\lib'
 
   - task: DotNetCoreCLI@2
     displayName: 'dotnet test'
     inputs:
       command: test
-      workingDirectory: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\src'
+      workingDirectory: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)'
       publishTestResults: true
-
-  - task: DotNetCoreCLI@2
-    displayName: 'dotnet build $(buildConfiguration)'
-    inputs:
-      command: build
-      arguments: '--configuration $(buildConfiguration) -v m -o lib'
-      workingDirectory: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\src'
 
   - task: NuGetCommand@2
     displayName: 'NuGet Pack'
