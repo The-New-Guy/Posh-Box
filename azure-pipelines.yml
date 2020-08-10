@@ -80,6 +80,7 @@ jobs:
     displayName: 'dotnet build Release'
     inputs:
       command: build
+      projects: '$(Build.SourcesDirectory)\src\$(Custom.ProjectName).csproj'
       arguments: '--configuration Release -v m -o $(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\src\lib'
 
   - task: DotNetCoreCLI@2
