@@ -27,6 +27,10 @@ jobs:
 
   steps:
 
+  - checkout: self
+    clean: true
+    persistCredentials: true
+
   - task: gittools.gitversion.gitversion-task.GitVersion@5
     displayName: GitVersion
     inputs:
