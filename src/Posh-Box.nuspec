@@ -13,6 +13,6 @@
     <tags>PSModule Box</tags>
   </metadata>
   <files>
-    <file src="Posh-Box.psd1;lib/;format/;" target="" exclude="*.nuspec" />
+    <file src="Posh-Box.psd1;lib/;format/;" target="" exclude="" />
   </files>
 </package>
