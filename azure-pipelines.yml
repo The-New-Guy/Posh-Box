@@ -86,6 +86,7 @@ jobs:
     displayName: 'dotnet test'
     inputs:
       command: test
+      arguments: '--configuration Release -v m -o $(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\tests\lib'
       workingDirectory: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)'
       publishTestResults: true
 
