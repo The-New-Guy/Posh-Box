@@ -122,7 +122,7 @@ jobs:
     inputs:
       buildFile: '$(Build.SourcesDirectory)\Build\psakefile.ps1'
       tasks: VersionPSModule
-      parameters: 'ModuleManifest=$(Build.SourcesDirectory)\src\$(Custom.ProjectName).psd1,ExcludePreReleaseTag=true,IsVerbose=true'
+      parameters: 'ModuleManifest=$(Build.SourcesDirectory)\src\$(Custom.ProjectName).psd1,ProjectFile=$(Build.SourcesDirectory)\src\$(Custom.ProjectName).csproj,ExcludePreReleaseTag=true,IsVerbose=true'
     condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix/')))
 
   - task: qetza.psake.psake-task.psake@5
