@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>Posh-Box</id>
+    <version>0.1.0</version>
+    <title>Posh-Box</title>
+    <authors>New-Guy</authors>
+    <owners>New-Guy</owners>
+    <projectUrl>https://github.com/The-New-Guy/Posh-Box</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>PowerShell module used to perform administrative tasks against the Box API.</description>
+    <copyright>Copyright (c) New-Guy.com 2020</copyright>
+    <tags>PSModule Box</tags>
+  </metadata>
+  <files>
+    <file src="Posh-Box.psd1;lib\**\*.*;format\**\*.*;" target="" exclude="" />
+  </files>
+</package>

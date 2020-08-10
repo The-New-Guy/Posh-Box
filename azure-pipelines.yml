@@ -1,0 +1,131 @@
+# Azure DevOps Pipelines Build configuration
+
+name: $(rev:r)
+
+trigger:
+- master
+- release/*
+- hotfix/*
+- feature/*
+
+pr:
+- master
+
+jobs:
+
+- job: Build_Windows
+
+  pool:
+    vmImage: windows-latest
+
+  workspace:
+    clean: all
+
+  variables:
+    - name: Custom.ProjectName
+      value: Posh-Box
+
+  steps:
+
+  - task: gittools.gitversion.gitversion-task.GitVersion@4
+    displayName: GitVersion
+    inputs:
+      preferBundledVersion: false
+
+  - task: CopyFiles@2
+    displayName: 'Copy Files to Version Folder'
+    inputs:
+      SourceFolder: '$(Build.SourcesDirectory)'
+      Contents: |
+        src\**
+        tests\**
+      TargetFolder: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)'
+      CleanTargetFolder: true
+
+  - task: CdiscountAlm.vsts-nugetversionsynchronizer-tasks.vsts-nugetversionsynchronizer-task.NugetVersionSynchronizer@0
+    displayName: 'Version NuSpec File'
+    inputs:
+      dropFolderPath: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\src'
+      nuspecFileName: '$(Custom.ProjectName).nuspec'
+      modelVersionFileName: '$(Custom.ProjectName).nuspec'
+      forceToVersion: '$(GitVersion.NuGetVersionV2)'
+
+  - task: qetza.psake.psake-task.psake@5
+    displayName: 'Invoke psake Build Script - Version Module'
+    inputs:
+      buildFile: '$(Build.SourcesDirectory)\Build\psakefile.ps1'
+      tasks: VersionPSModule
+      parameters: 'IsVerbose=true'
+
+  - task: qetza.psake.psake-task.psake@5
+    displayName: 'Invoke psake Build Script - Prep Tests'
+    inputs:
+      buildFile: '$(Build.SourcesDirectory)\Build\psakefile.ps1'
+      tasks: PrepTests
+      parameters: 'IsVerbose=true'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet restore'
+    inputs:
+      command: restore
+      feedsToUse: select
+      vstsFeed: NGGet
+      workingDirectory: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\src'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet test'
+    inputs:
+      command: test
+      workingDirectory: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\src'
+      publishTestResults: true
+
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet build $(buildConfiguration)'
+    inputs:
+      command: build
+      arguments: '--configuration $(buildConfiguration) -v m -o lib'
+      workingDirectory: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\src'
+
+  - task: NuGetCommand@2
+    displayName: 'NuGet Pack'
+    inputs:
+      command: pack
+      packagesToPack: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\src\$(Custom.ProjectName).nuspec'
+      packDestination: '$(Build.ArtifactStagingDirectory)\Packages'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact - Source Code'
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)'
+      ArtifactName: 'Build Artifacts'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact - Packages'
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)\Packages'
+      ArtifactName: Packages
+
+  - task: CdiscountAlm.vsts-nugetversionsynchronizer-tasks.vsts-nugetversionsynchronizer-task.NugetVersionSynchronizer@0
+    displayName: 'Version NuSpec File for Production'
+    inputs:
+      dropFolderPath: '$(Build.SourcesDirectory)\src'
+      nuspecFileName: '$(Custom.ProjectName).nuspec'
+      modelVersionFileName: '$(Custom.ProjectName).nuspec'
+      forceToVersion: '$(GitVersion.MajorMinorPatch)'
+    condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix/')))
+
+  - task: qetza.psake.psake-task.psake@5
+    displayName: 'Invoke psake Build Script - Version Module for Production'
+    inputs:
+      buildFile: '$(Build.SourcesDirectory)\Build\psakefile.ps1'
+      tasks: VersionPSModule
+      parameters: 'ModuleManifest=$(Build.SourcesDirectory)\src\$(Custom.ProjectName).psd1,ExcludePreReleaseTag=true,IsVerbose=true'
+    condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix/')))
+
+  - task: qetza.psake.psake-task.psake@5
+    displayName: 'Invoke psake Build Script - Commit Release Changes'
+    inputs:
+      buildFile: '$(Build.SourcesDirectory)\Build\psakefile.ps1'
+      tasks: CommitReleaseChanges
+      parameters: 'IsVerbose=true'
+    condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix/')))
