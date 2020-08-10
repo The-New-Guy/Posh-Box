@@ -14,6 +14,7 @@
 # /specific/directory/in/this/path/
 
 /src/lib/
+/tests/lib/
 
 ########################
 ### Custom File Types ##

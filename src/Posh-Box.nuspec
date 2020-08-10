@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Posh-Box</id>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
     <title>Posh-Box</title>
     <authors>New-Guy</authors>
     <owners>New-Guy</owners>
@@ -13,6 +13,6 @@
     <tags>PSModule Box</tags>
   </metadata>
   <files>
-    <file src="Posh-Box.psd1;lib\**\*.*;format\**\*.*;" target="" exclude="" />
+    <file src="Posh-Box.psd1;lib/;format/;" target="" exclude="" />
   </files>
 </package>

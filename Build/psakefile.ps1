@@ -88,6 +88,16 @@ Properties {
 
     ##----------
 
+    if (-not $GitVersionAssemblySemVer) {
+        if ($env:GITVERSION_ASSEMBLYSEMVER) { $GitVersionAssemblySemVer = $env:GITVERSION_ASSEMBLYSEMVER }
+        elseif (Get-Command -Name 'GitVersion.exe' -ErrorAction SilentlyContinue) { $GitVersionAssemblySemVer = (GitVersion.exe | ConvertFrom-Json).AssemblySemVer }
+        else { $GitVersionAssemblySemVer = '0.1.0.0' }
+    }
+
+    Write-Output "GitVersionAssemblySemVer : $GitVersionAssemblySemVer"
+
+    ##----------
+
     if (-not $GitVersionNuGetPreReleaseTagV2) {
         if ($env:GITVERSION_NUGETPRERELEASETAGV2) { $GitVersionNuGetPreReleaseTagV2 = $env:GITVERSION_NUGETPRERELEASETAGV2 }
         elseif ($env:GITVERSION_BRANCHNAME -eq 'master') { $GitVersionNuGetPreReleaseTagV2 = '' }
