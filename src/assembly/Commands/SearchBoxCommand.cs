@@ -1,11 +1,7 @@
 using Box.V2;
-using Box.V2.Exceptions;
 using Box.V2.Models;
-using Box.V2.Models.Request;
 using PoshBox.Helper;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Management.Automation;
 
 namespace PoshBox.Commands
