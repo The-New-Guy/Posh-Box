@@ -44,6 +44,41 @@ namespace PoshBox.Helper
 
     }
 
+    // This ArgumentCompleter is for tab completion of the Properties parameter for BoxCollaboration type commands.
+    // See the following for property names : https://developer.box.com/reference/resources/collaboration
+
+    /// <summary>
+    /// PowerShell IArgumentCompleter used to provide tab completion support for the commonly used "-Properties" parameter.
+    /// </summary>
+    public class BoxCollaborationPropertyNameCompleter : IArgumentCompleter
+    {
+
+        public static readonly string[] AllPropertyNames = PropertyUtility.GetPropertyDisplayNames(typeof(BoxCollaboration));
+
+        public static readonly string[] DefaultPropertyNames = new string[] {
+            "Id",
+            "Type",
+            "AccessibleBy",
+            "CreatedAt",
+            "Item",
+            "Role",
+            "Status"
+        };
+
+        IEnumerable<CompletionResult> IArgumentCompleter.CompleteArgument(
+            string commandName,
+            string parameterName,
+            string wordToComplete,
+            CommandAst commandAst,
+            IDictionary fakeBoundParameters
+        ) {
+            return AllPropertyNames.
+                Where(new WildcardPattern(wordToComplete + "*", WildcardOptions.IgnoreCase).IsMatch).
+                Select(s => new CompletionResult(s));
+        }
+
+    }
+
     // This ArgumentCompleter is for tab completion of the Properties parameter for BoxItem type commands.
     // See the following for property names : https://developer.box.com/reference/get-folders-id-items
 

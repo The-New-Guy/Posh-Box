@@ -64,6 +64,7 @@ Description = 'PowerShell module used to perform administrative tasks against th
 
 # Format files (.ps1xml) to be loaded when importing this module
 FormatsToProcess = @(
+    'format/BoxCollaboration.Format.ps1xml'
     'format/BoxItem.Format.ps1xml'
     'format/BoxUser.Format.ps1xml'
 )
