@@ -11,149 +11,199 @@ trigger:
 pr:
 - master
 
-jobs:
+stages:
 
-- job: Build_Windows
+- stage: Build
 
-  pool:
-    vmImage: windows-latest
+  jobs:
 
-  workspace:
-    clean: all
+  - job: Build_Windows
 
-  variables:
-    - name: Custom.ProjectName
-      value: Posh-Box
+    displayName: Build Windows
 
-  steps:
+    pool:
+      vmImage: windows-latest
 
-  - checkout: self
-    clean: true
-    persistCredentials: true
+    workspace:
+      clean: all
 
-  # GitVersion : Setup the package versions based on repository information.
-  - task: gittools.gitversion.gitversion-task.GitVersion@5
-    displayName: GitVersion
-    inputs:
-      preferBundledVersion: false
+    variables:
+      - name: Custom.ProjectName
+        value: Posh-Box
 
-  # Copy Files to Staging : All artifacts will be stored in Build.ArtifactStagingDirectory in a folder named after the current version.
-  - task: CopyFiles@2
-    displayName: 'Copy Files to Version Folder'
-    inputs:
-      SourceFolder: '$(Build.SourcesDirectory)'
-      Contents: |
-        src\**
-        tests\**
-        $(Custom.ProjectName).sln
-      TargetFolder: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)'
-      CleanTargetFolder: true
+    steps:
 
-  # NuSpec Version : Set the version number in the NuSpec file for the NuGet package.
-  - task: CdiscountAlm.vsts-nugetversionsynchronizer-tasks.vsts-nugetversionsynchronizer-task.NugetVersionSynchronizer@0
-    displayName: 'Version NuSpec File'
-    inputs:
-      dropFolderPath: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\src'
-      nuspecFileName: '$(Custom.ProjectName).nuspec'
-      modelVersionFileName: '$(Custom.ProjectName).nuspec'
-      forceToVersion: '$(GitVersion.NuGetVersionV2)'
+    - checkout: self
+      clean: true
+      persistCredentials: true
 
-  # PSake - Version Module : Set the version number in the PowerShell Module Manifest file using a PSake script.
-  - task: qetza.psake.psake-task.psake@5
-    displayName: 'Invoke psake Build Script - Version Module'
-    inputs:
-      buildFile: '$(Build.SourcesDirectory)\Build\psakefile.ps1'
-      tasks: VersionPSModule
-      parameters: 'IsVerbose=true'
+    # GitVersion : Setup the package versions based on repository information.
+    - task: gittools.gitversion.gitversion-task.GitVersion@5
+      displayName: GitVersion
+      inputs:
+        preferBundledVersion: false
 
-  # PSake - Prep Tests : Prepare the environment for the upcoming tests.
-  - task: qetza.psake.psake-task.psake@5
-    displayName: 'Invoke psake Build Script - Prep Tests'
-    inputs:
-      buildFile: '$(Build.SourcesDirectory)\Build\psakefile.ps1'
-      tasks: PrepTests
-      parameters: 'IsVerbose=true'
+    # Copy Files to Staging : All artifacts will be stored in Build.ArtifactStagingDirectory in a folder named after the current version.
+    - task: CopyFiles@2
+      displayName: 'Copy Files to Version Folder'
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)'
+        Contents: |
+          src\**
+          tests\**
+          $(Custom.ProjectName).sln
+        TargetFolder: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)'
+        CleanTargetFolder: true
 
-  # .NET Restore : Restore all package references needed to build.
-  - task: DotNetCoreCLI@2
-    displayName: 'dotnet restore'
-    inputs:
-      command: restore
-      feedsToUse: select
-      vstsFeed: NGGet
+    # NuSpec Version : Set the version number in the NuSpec file for the NuGet package.
+    - task: CdiscountAlm.vsts-nugetversionsynchronizer-tasks.vsts-nugetversionsynchronizer-task.NugetVersionSynchronizer@0
+      displayName: 'Version NuSpec File'
+      inputs:
+        dropFolderPath: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\src'
+        nuspecFileName: '$(Custom.ProjectName).nuspec'
+        modelVersionFileName: '$(Custom.ProjectName).nuspec'
+        forceToVersion: '$(GitVersion.NuGetVersionV2)'
 
-  # .NET Build : Build the project.
-  - task: DotNetCoreCLI@2
-    displayName: 'dotnet build Release'
-    inputs:
-      command: build
-      projects: '$(Build.SourcesDirectory)\src\$(Custom.ProjectName).csproj'
-      arguments: '--configuration Release -v m -o $(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\src\lib'
+    # PSake - Version Module : Set the version number in the PowerShell Module Manifest file using a PSake script.
+    - task: qetza.psake.psake-task.psake@5
+      displayName: 'Invoke psake Build Script - Version Module'
+      inputs:
+        buildFile: '$(Build.SourcesDirectory)\Build\psakefile.ps1'
+        tasks: VersionPSModule
+        parameters: 'IsVerbose=true'
 
-  # .NET Test : Run project tests.
-  - task: DotNetCoreCLI@2
-    displayName: 'dotnet test'
-    inputs:
-      command: test
-      arguments: '--configuration Release -v m -o $(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\tests\lib'
-      workingDirectory: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)'
-      publishTestResults: true
+    # PSake - Prep Tests : Prepare the environment for the upcoming tests.
+    - task: qetza.psake.psake-task.psake@5
+      displayName: 'Invoke psake Build Script - Prep Tests'
+      inputs:
+        buildFile: '$(Build.SourcesDirectory)\Build\psakefile.ps1'
+        tasks: PrepTests
+        parameters: 'IsVerbose=true'
 
-  # NuGet Pack : Package up the NuGet package.
-  - task: NuGetCommand@2
-    displayName: 'NuGet Pack'
-    inputs:
-      command: pack
-      packagesToPack: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\src\$(Custom.ProjectName).nuspec'
-      packDestination: '$(Build.ArtifactStagingDirectory)\Packages'
+    # .NET Restore : Restore all package references needed to build.
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet restore'
+      inputs:
+        command: restore
+        projects: 
+        feedsToUse: select
+        vstsFeed: NGGet
 
-  # Zip : Zip up the package for GitHub Release page.
-  - task: ArchiveFiles@2
-    displayName: 'Zip'
-    inputs:
-      rootFolderOrFile: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\src'
-      archiveFile: '$(Build.ArtifactStagingDirectory)\Packages\$(GitVersion.FullSemVer).zip'
-      archiveType: zip
-      verbose: true
+    # .NET Build : Build the project.
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet build Release'
+      inputs:
+        command: build
+        workingDirectory: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)'
+        arguments: '--configuration Release -v m -o $(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\src\lib'
 
-  # Publish Artifacts : Publish all artifacts to Azure DevOps.
+    # .NET Test : Run project tests.
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet test'
+      inputs:
+        command: test
+        arguments: '--configuration Release -v m -o $(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\tests\lib'
+        workingDirectory: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)'
+        publishTestResults: true
 
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact - Source Code'
-    inputs:
-      PathtoPublish: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)'
-      ArtifactName: 'Build Artifacts'
+    # NuGet Pack : Package up the NuGet package.
+    - task: NuGetCommand@2
+      displayName: 'NuGet Pack'
+      inputs:
+        command: pack
+        packagesToPack: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\src\$(Custom.ProjectName).nuspec'
+        packDestination: '$(Build.ArtifactStagingDirectory)\Packages'
 
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact - Packages'
-    inputs:
-      PathtoPublish: '$(Build.ArtifactStagingDirectory)\Packages'
-      ArtifactName: Packages
+    # Zip Pack : Zip up the package for GitHub Release page.
+    - task: ArchiveFiles@2
+      displayName: 'Zip'
+      inputs:
+        rootFolderOrFile: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\src'
+        archiveFile: '$(Build.ArtifactStagingDirectory)\Packages\$(GitVersion.FullSemVer).zip'
+        archiveType: zip
+        includeRootFolder: false
+        verbose: true
 
-  # NuSpec Version : Set the version number for production in the NuSpec file for the NuGet package.
-  - task: CdiscountAlm.vsts-nugetversionsynchronizer-tasks.vsts-nugetversionsynchronizer-task.NugetVersionSynchronizer@0
-    displayName: 'Version NuSpec File for Production'
-    inputs:
-      dropFolderPath: '$(Build.SourcesDirectory)\src'
-      nuspecFileName: '$(Custom.ProjectName).nuspec'
-      modelVersionFileName: '$(Custom.ProjectName).nuspec'
-      forceToVersion: '$(GitVersion.MajorMinorPatch)'
-    condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix/')))
+    # Publish Artifacts : Publish all artifacts to Azure DevOps.
 
-  # PSake - Version Module : Set the version number for production in the PowerShell Module Manifest file using a PSake script.
-  - task: qetza.psake.psake-task.psake@5
-    displayName: 'Invoke psake Build Script - Version Module for Production'
-    inputs:
-      buildFile: '$(Build.SourcesDirectory)\Build\psakefile.ps1'
-      tasks: VersionPSModule
-      parameters: 'ModuleManifest=$(Build.SourcesDirectory)\src\$(Custom.ProjectName).psd1,ProjectFile=$(Build.SourcesDirectory)\src\$(Custom.ProjectName).csproj,ExcludePreReleaseTag=true,IsVerbose=true'
-    condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix/')))
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact - Source Code'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)'
+        ArtifactName: 'Build Artifacts'
 
-  # Commit Release Changes : Commit the updated version number changes back to the repository.
-  - task: qetza.psake.psake-task.psake@5
-    displayName: 'Invoke psake Build Script - Commit Release Changes'
-    inputs:
-      buildFile: '$(Build.SourcesDirectory)\Build\psakefile.ps1'
-      tasks: CommitReleaseChanges
-      parameters: 'IsVerbose=true'
-    condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix/')))
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact - Packages'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)\Packages'
+        ArtifactName: Packages
+
+    # NuSpec Version : Set the version number for production in the NuSpec file for the NuGet package.
+    - task: CdiscountAlm.vsts-nugetversionsynchronizer-tasks.vsts-nugetversionsynchronizer-task.NugetVersionSynchronizer@0
+      displayName: 'Version NuSpec File for Production'
+      inputs:
+        dropFolderPath: '$(Build.SourcesDirectory)\src'
+        nuspecFileName: '$(Custom.ProjectName).nuspec'
+        modelVersionFileName: '$(Custom.ProjectName).nuspec'
+        forceToVersion: '$(GitVersion.MajorMinorPatch)'
+      condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix/')))
+
+    # PSake - Version Module : Set the version number for production in the PowerShell Module Manifest file using a PSake script.
+    - task: qetza.psake.psake-task.psake@5
+      displayName: 'Invoke psake Build Script - Version Module for Production'
+      inputs:
+        buildFile: '$(Build.SourcesDirectory)\Build\psakefile.ps1'
+        tasks: VersionPSModule
+        parameters: 'ModuleManifest=$(Build.SourcesDirectory)\src\$(Custom.ProjectName).psd1,ProjectFile=$(Build.SourcesDirectory)\src\$(Custom.ProjectName).csproj,ExcludePreReleaseTag=true,IsVerbose=true'
+      condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix/')))
+
+    # Commit Release Changes : Commit the updated version number changes back to the repository.
+    - task: qetza.psake.psake-task.psake@5
+      displayName: 'Invoke psake Build Script - Commit Release Changes'
+      inputs:
+        buildFile: '$(Build.SourcesDirectory)\Build\psakefile.ps1'
+        tasks: CommitReleaseChanges
+        parameters: 'IsVerbose=true'
+      condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix/')))
+
+- stage: Deploy
+
+  jobs:
+
+  - deployment: Publish NuGet
+
+    displayName: NuGet Packages
+
+    pool:
+      vmImage: windows-latest
+
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - task: NuGetCommand@2
+              displayName: NuGet Push
+              inputs:
+                command: push
+                packagesToPush: '$(System.ArtifactsDirectory)/**/*.nupkg;!$(System.ArtifactsDirectory)/**/*.symbols.nupkg'
+                publishVstsFeed: '3abed858-ab48-4210-92c9-ea153739463b'
+
+  - deployment: Publish Zip
+
+    displayName: GitHub Release
+
+    pool:
+      vmImage: windows-latest
+
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - task: GitHubRelease@1
+              displayName: 'GitHub release (create)'
+              inputs:
+                gitHubConnection: 'GitHub : The-New-Guy'
+                assets: '$(System.ArtifactsDirectory)/**/*.zip'
+                isDraft: true
