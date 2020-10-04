@@ -11,6 +11,11 @@ trigger:
 pr:
 - master
 
+variables:
+
+  - name: Custom.ProjectName
+    value: Posh-Box
+
 stages:
 
 - stage: Build
@@ -27,10 +32,6 @@ stages:
     workspace:
       clean: all
 
-    variables:
-      - name: Custom.ProjectName
-        value: Posh-Box
-
     steps:
 
     - checkout: self
@@ -38,14 +39,16 @@ stages:
       persistCredentials: true
 
     # GitVersion : Setup the package versions based on repository information.
-    - task: gittools.gitversion.gitversion-task.GitVersion@5
+    - task: GitVersion@5
       displayName: GitVersion
       inputs:
-        preferBundledVersion: false
+        runtime: 'core'
+        configFilePath: '$(Build.SourcesDirectory)\GitVersion.yml'
+
 
     # Copy Files to Staging : All artifacts will be stored in Build.ArtifactStagingDirectory in a folder named after the current version.
     - task: CopyFiles@2
-      displayName: 'Copy Files to Version Folder'
+      displayName: 'Copy Files for Versioning'
       inputs:
         SourceFolder: '$(Build.SourcesDirectory)'
         Contents: |
@@ -80,18 +83,9 @@ stages:
         tasks: PrepTests
         parameters: 'IsVerbose=true'
 
-    # .NET Restore : Restore all package references needed to build.
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet restore'
-      inputs:
-        command: restore
-        projects: 
-        feedsToUse: select
-        vstsFeed: NGGet
-
     # .NET Build : Build the project.
     - task: DotNetCoreCLI@2
-      displayName: 'dotnet build Release'
+      displayName: 'dotnet build'
       inputs:
         command: build
         workingDirectory: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)'
@@ -106,22 +100,36 @@ stages:
         workingDirectory: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)'
         publishTestResults: true
 
+    # Copy Files for Packaging : Copy only the files we want to package.
+    - task: CopyFiles@2
+      displayName: 'Copy Files for Packaging'
+      inputs:
+        SourceFolder: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\src'
+        Contents: |
+          lib\**
+          format\**
+          $(Custom.ProjectName).psd1
+          $(Custom.ProjectName).nuspec
+        TargetFolder: '$(Build.ArtifactStagingDirectory)\Staging\$(GitVersion.MajorMinorPatch)'
+        CleanTargetFolder: true
+
     # NuGet Pack : Package up the NuGet package.
     - task: NuGetCommand@2
       displayName: 'NuGet Pack'
       inputs:
         command: pack
-        packagesToPack: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\src\$(Custom.ProjectName).nuspec'
-        packDestination: '$(Build.ArtifactStagingDirectory)\Packages'
+        packagesToPack: '$(Build.ArtifactStagingDirectory)\Staging\$(GitVersion.MajorMinorPatch)\$(Custom.ProjectName).nuspec'
+        packDestination: '$(Build.ArtifactStagingDirectory)\Staging\Packages'
+        verbosityPack: Detailed
 
     # Zip Pack : Zip up the package for GitHub Release page.
     - task: ArchiveFiles@2
-      displayName: 'Zip'
+      displayName: 'Zip Pack'
       inputs:
-        rootFolderOrFile: '$(Build.ArtifactStagingDirectory)\$(GitVersion.FullSemVer)\src'
-        archiveFile: '$(Build.ArtifactStagingDirectory)\Packages\$(GitVersion.FullSemVer).zip'
+        rootFolderOrFile: '$(Build.ArtifactStagingDirectory)\Staging\$(GitVersion.MajorMinorPatch)'
+        archiveFile: '$(Build.ArtifactStagingDirectory)\Staging\Packages\$(GitVersion.FullSemVer).zip'
         archiveType: zip
-        includeRootFolder: false
+        includeRootFolder: true
         verbose: true
 
     # Publish Artifacts : Publish all artifacts to Azure DevOps.
@@ -135,7 +143,7 @@ stages:
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact - Packages'
       inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)\Packages'
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)\Staging\Packages'
         ArtifactName: Packages
 
     # NuSpec Version : Set the version number for production in the NuSpec file for the NuGet package.
@@ -170,30 +178,41 @@ stages:
 
   jobs:
 
-  - deployment: Publish NuGet
+  - deployment: Publish_NuGet
 
     displayName: NuGet Packages
 
     pool:
       vmImage: windows-latest
 
+    environment: NuGet
+
     strategy:
       runOnce:
         deploy:
           steps:
+
+            - download: current
+              artifact: Packages
+              patterns: '**/*.nupkg'
+
+            # Publish to NuGet feed.
             - task: NuGetCommand@2
               displayName: NuGet Push
               inputs:
                 command: push
-                packagesToPush: '$(System.ArtifactsDirectory)/**/*.nupkg;!$(System.ArtifactsDirectory)/**/*.symbols.nupkg'
-                publishVstsFeed: '3abed858-ab48-4210-92c9-ea153739463b'
+                packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg;!$(Pipeline.Workspace)/**/*.symbols.nupkg'
+                publishVstsFeed: NGGet
+                verbosityPush: Detailed
 
-  - deployment: Publish Zip
+  - deployment: Publish_GitHub
 
     displayName: GitHub Release
 
     pool:
       vmImage: windows-latest
+
+    environment: GitHub
 
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 
@@ -201,9 +220,15 @@ stages:
       runOnce:
         deploy:
           steps:
+
+            - download: current
+              artifact: Packages
+              patterns: '**/*.zip'
+
+            # Create a GitHub Release with package zip file.
             - task: GitHubRelease@1
-              displayName: 'GitHub release (create)'
+              displayName: 'GitHub Release'
               inputs:
                 gitHubConnection: 'GitHub : The-New-Guy'
-                assets: '$(System.ArtifactsDirectory)/**/*.zip'
+                assets: '$(Build.ArtifactStagingDirectory)/**/*.zip'
                 isDraft: true
