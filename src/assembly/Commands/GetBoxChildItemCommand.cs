@@ -139,7 +139,7 @@ namespace PoshBox.Commands
                     {
                         try
                         {
-                            FolderUtility.WalkFolderTree(client, (BoxFolder)currItem, WriteObject, WriteVerbose, Properties, PageSize, RecursionDepth - 1);
+                            Utility.WalkFolderTree(client, (BoxFolder)currItem, WriteObject, WriteVerbose, Properties, PageSize, RecursionDepth - 1);
                         }
                         catch (Exception e)
                         {

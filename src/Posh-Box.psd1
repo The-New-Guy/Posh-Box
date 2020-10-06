@@ -12,7 +12,7 @@
 RootModule = 'lib/Posh-Box.dll'
 
 # Version number of this module.
-ModuleVersion = '0.2.0'
+ModuleVersion = '0.3.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -64,6 +64,7 @@ Description = 'PowerShell module used to perform administrative tasks against th
 
 # Format files (.ps1xml) to be loaded when importing this module
 FormatsToProcess = @(
+    'format/BoxCollaboration.Format.ps1xml'
     'format/BoxItem.Format.ps1xml'
     'format/BoxUser.Format.ps1xml'
 )
