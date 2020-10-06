@@ -13,7 +13,7 @@ This is a work in progress. This README file currently a place to take notes mor
 
 > Module publishing not implemented yet.
 
-Either download the module from the [Releases](releases) page or build the module using the instructions in the [How to Build](#how-to-build) section.
+Either download the module from the [Releases](https://github.com/The-New-Guy/Posh-Box/releases) page or build the module using the instructions in the [How to Build](#how-to-build) section.
 
 Once you have acquired the module place it in your PSModulePath. Read more about PSModulePath [Here](https://msdn.microsoft.com/en-us/library/dd878324%28v=vs.85%29.aspx).
 
