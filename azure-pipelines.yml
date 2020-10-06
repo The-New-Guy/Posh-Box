@@ -174,7 +174,7 @@ stages:
         parameters: 'IsVerbose=true'
       condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix/')))
 
-- stage: Deploy
+- stage: Deploy_NuGet
 
   jobs:
 
@@ -204,6 +204,10 @@ stages:
                 packagesToPush: '$(Pipeline.Workspace)/**/*.nupkg;!$(Pipeline.Workspace)/**/*.symbols.nupkg'
                 publishVstsFeed: NGGet
                 verbosityPush: Detailed
+
+- stage: GitHub_Release
+
+  jobs:
 
   - deployment: Publish_GitHub
 
