@@ -4,8 +4,8 @@
 | Branch | Status |
 |--------|--------|
 |**Master**|[![Build Status](https://dev.azure.com/The-New-Guy/Hobbies/_apis/build/status/Posh-Box?branchName=master)](https://dev.azure.com/The-New-Guy/Hobbies/_build/latest?definitionId=10&branchName=master)|
-|**NuGet**|[![NuGet Publish Status](https://dev.azure.com/The-New-Guy/Hobbies/_apis/build/status/Posh-Box?branchName=master&stageName=Publish_NuGet&jobName=Packages)](https://dev.azure.com/The-New-Guy/Hobbies/_build/latest?definitionId=10&branchName=master)
-|**GitHub**|[![GitHub Release Status](https://dev.azure.com/The-New-Guy/Hobbies/_apis/build/status/Posh-Box?branchName=master&stageName=GitHub_Release&jobName=Draft)](https://dev.azure.com/The-New-Guy/Hobbies/_build/latest?definitionId=10&branchName=master)
+|**NuGet**|[![NuGet Publish Status](https://dev.azure.com/The-New-Guy/Hobbies/_apis/build/status/Posh-Box?branchName=master&stageName=Publish%20NuGet&jobName=Packages)](https://dev.azure.com/The-New-Guy/Hobbies/_build/latest?definitionId=10&branchName=master)
+|**GitHub**|[![GitHub Release Status](https://dev.azure.com/The-New-Guy/Hobbies/_apis/build/status/Posh-Box?branchName=master&stageName=GitHub%20Release&jobName=Draft)](https://dev.azure.com/The-New-Guy/Hobbies/_build/latest?definitionId=10&branchName=master)
 
 This is a work in progress. This README file currently a place to take notes more than anything.
 
@@ -13,7 +13,7 @@ This is a work in progress. This README file currently a place to take notes mor
 
 > Module publishing not implemented yet.
 
-Either download the module from the [Releases](Releases) page or build the module using the instructions in the [How to Build](#how-to-build) section.
+Either download the module from the [Releases](releases) page or build the module using the instructions in the [How to Build](#how-to-build) section.
 
 Once you have acquired the module place it in your PSModulePath. Read more about PSModulePath [Here](https://msdn.microsoft.com/en-us/library/dd878324%28v=vs.85%29.aspx).
 
