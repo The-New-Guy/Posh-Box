@@ -22,9 +22,7 @@ stages:
 
   jobs:
 
-  - job: Build_Windows
-
-    displayName: Build Windows
+  - job: Windows
 
     pool:
       vmImage: windows-latest
@@ -174,15 +172,13 @@ stages:
         parameters: 'IsVerbose=true'
       condition: and(succeeded(), or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix/')))
 
-- stage: Deploy_NuGet
+- stage: Publish_NuGet
 
-  displayName: Deploy NuGet
+  displayName: Publish NuGet
 
   jobs:
 
-  - deployment: Publish_NuGet
-
-    displayName: NuGet Packages
+  - deployment: Packages
 
     pool:
       vmImage: windows-latest
@@ -213,9 +209,7 @@ stages:
 
   jobs:
 
-  - deployment: Publish_GitHub
-
-    displayName: GitHub Release
+  - deployment: Draft
 
     pool:
       vmImage: windows-latest
