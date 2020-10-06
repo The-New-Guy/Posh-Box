@@ -3,7 +3,7 @@
   <PropertyGroup>
     <!-- <TargetFrameworks>netstandard2.0;net461;net472;</TargetFrameworks> -->
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <Version>0.3.0</Version>
+    <Version>0.3.1</Version>
     <Authors>New-Guy</Authors>
     <Company>New-Guy.com</Company>
     <Description>A .NET Standard Class Library that provides a wrapper around the Box API.</Description>
@@ -12,8 +12,8 @@
     <PackageTags>Box, File, Folder</PackageTags>
     <Copyright>Copyright New-Guy 2020</Copyright>
     <AssemblyName>Posh-Box</AssemblyName>
-    <AssemblyVersion>0.3.0.0</AssemblyVersion>
-    <FileVersion>0.3.0.0</FileVersion>
+    <AssemblyVersion>0.3.1.0</AssemblyVersion>
+    <FileVersion>0.3.1.0</FileVersion>
     <RootNamespace>PoshBox</RootNamespace>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
