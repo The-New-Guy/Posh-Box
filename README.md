@@ -1,5 +1,12 @@
 # Posh-Box
 
+## Build Status
+| Branch | Status |
+|--------|--------|
+|**Master**|[![Build Status](https://dev.azure.com/The-New-Guy/Hobbies/_apis/build/status/Posh-Box?branchName=master)](https://dev.azure.com/The-New-Guy/Hobbies/_build/latest?definitionId=10&branchName=master)|
+|**NuGet**|[![NuGet Deployment Status](https://dev.azure.com/The-New-Guy/Hobbies/_apis/build/status/Posh-Box?branchName=master&stageName=Deploy&jobName=NuGet%20Packages)](https://dev.azure.com/The-New-Guy/Hobbies/_build/latest?definitionId=10&branchName=master)
+|**GitHub**|[![GitHub Release](https://dev.azure.com/The-New-Guy/Hobbies/_apis/build/status/Posh-Box?branchName=master&stageName=Deploy&jobName=GitHub%20Release)](https://dev.azure.com/The-New-Guy/Hobbies/_build/latest?definitionId=10&branchName=master)
+
 This is a work in progress. This README file currently a place to take notes more than anything.
 
 ## How to Install Module
