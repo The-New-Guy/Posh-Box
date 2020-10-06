@@ -176,6 +176,8 @@ stages:
 
 - stage: Deploy_NuGet
 
+  displayName: Deploy NuGet
+
   jobs:
 
   - deployment: Publish_NuGet
@@ -206,6 +208,8 @@ stages:
                 verbosityPush: Detailed
 
 - stage: GitHub_Release
+
+  displayName: GitHub Release
 
   jobs:
 
