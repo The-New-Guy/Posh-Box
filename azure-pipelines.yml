@@ -232,5 +232,5 @@ stages:
               displayName: 'GitHub Release'
               inputs:
                 gitHubConnection: 'GitHub : The-New-Guy'
-                assets: '$(Build.ArtifactStagingDirectory)/**/*.zip'
+                assets: '$(Pipeline.Workspace)/**/*.zip'
                 isDraft: true
