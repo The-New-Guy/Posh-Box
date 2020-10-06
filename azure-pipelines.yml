@@ -108,7 +108,7 @@ stages:
           format\**
           $(Custom.ProjectName).psd1
           $(Custom.ProjectName).nuspec
-        TargetFolder: '$(Build.ArtifactStagingDirectory)\Staging\$(GitVersion.MajorMinorPatch)'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)\Staging\$(Custom.ProjectName)\$(GitVersion.MajorMinorPatch)'
         CleanTargetFolder: true
 
     # NuGet Pack : Package up the NuGet package.
@@ -116,7 +116,7 @@ stages:
       displayName: 'NuGet Pack'
       inputs:
         command: pack
-        packagesToPack: '$(Build.ArtifactStagingDirectory)\Staging\$(GitVersion.MajorMinorPatch)\$(Custom.ProjectName).nuspec'
+        packagesToPack: '$(Build.ArtifactStagingDirectory)\Staging\$(Custom.ProjectName)\$(GitVersion.MajorMinorPatch)\$(Custom.ProjectName).nuspec'
         packDestination: '$(Build.ArtifactStagingDirectory)\Staging\Packages'
         verbosityPack: Detailed
 
@@ -124,8 +124,8 @@ stages:
     - task: ArchiveFiles@2
       displayName: 'Zip Pack'
       inputs:
-        rootFolderOrFile: '$(Build.ArtifactStagingDirectory)\Staging\$(GitVersion.MajorMinorPatch)'
-        archiveFile: '$(Build.ArtifactStagingDirectory)\Staging\Packages\$(GitVersion.FullSemVer).zip'
+        rootFolderOrFile: '$(Build.ArtifactStagingDirectory)\Staging\$(Custom.ProjectName)'
+        archiveFile: '$(Build.ArtifactStagingDirectory)\Staging\Packages\$(Custom.ProjectName)-$(GitVersion.FullSemVer).zip'
         archiveType: zip
         includeRootFolder: true
         verbose: true
